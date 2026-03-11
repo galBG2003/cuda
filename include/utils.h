@@ -8,3 +8,4 @@ void createBinaryFile(const std::string& filename, const std::vector<float>& dat
 std::vector<float> generateRandomVector(int size);
 void checkValidInput(const std::vector<float>& a, const std::vector<float>& b);
 void printResult(const std::vector<float>& a, const std::vector<float>& b,const std::vector<float>& c);
+void writeResultToFile(const std::vector<float>& c);

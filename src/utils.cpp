@@ -53,3 +53,13 @@ void printResult(const std::vector<float>& a, const std::vector<float>& b,const 
         std::cout << "c[" << i << "] = " << a[i] << "+ (" << b[i] <<") = " << c[i] << std::endl;
 
 }
+
+void writeResultToFile(const std::vector<float>& c){
+    std::ofstream file("../result.txt");
+    if(!file.is_open())
+        throw std::runtime_error("error creating result file");
+    
+    for(int i = 0; i < c.size(); i++)
+        file << "c[" << i << "] = " << c[i] << std::endl;
+    file.close();
+}

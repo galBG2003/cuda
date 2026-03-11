@@ -29,8 +29,15 @@ int main()
    
     printResult(a,b,c);
 
+    try{
+        writeResultToFile(c);
+    }
+    catch(const std::exception &e){
+        std::cerr << e.what() << std::endl;
+    }
+
     cudaDeviceReset();
-    
+
     return 0;
 }
 
