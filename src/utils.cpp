@@ -1,6 +1,7 @@
 #include "../include/utils.h"
 #include <fstream>
 #include <iostream>
+#include <ctime>
 
 void createBinaryFile(const std::string& filename, const std::vector<float>& data)
 {
@@ -35,7 +36,7 @@ std::vector<float> readBinaryFile(const std::string& filename)
 }
 
 std::vector<float> generateRandomVector(int size){
-    srand(10);
+    srand(time(0));
     std::vector<float> randomVector(size);
     for(int i = 0; i < size; i++)
         randomVector[i] = (float)rand() / RAND_MAX * 100;

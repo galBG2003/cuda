@@ -6,8 +6,10 @@
 
 int main()
 {
-    std::vector<float> a = generateRandomVector(5);
-    std::vector<float> valuesForB = {10.0f, 20.0f, 30.0f, 40.0f, 50.0f};
+    int vectorSize = 40 * 32;
+    int numThreadsPerBlock = 256;
+    std::vector<float> a = generateRandomVector(vectorSize);
+    std::vector<float> valuesForB =  generateRandomVector(vectorSize) ;
     std::vector<float> b;
     try {
     checkValidInput(a, valuesForB);
@@ -21,7 +23,7 @@ int main()
        
     std::vector<float> c(a.size(), 0);
 
-    cudaError_t cudaStatus = addWithCuda(c.data(), a.data(), b.data(), a.size());
+    cudaError_t cudaStatus = addWithCuda(c.data(), a.data(), b.data(), a.size(), numThreadsPerBlock);
     if (cudaStatus != cudaSuccess) {
         std::cerr << "addWithCuda failed!" << std::endl;
         return 1;
