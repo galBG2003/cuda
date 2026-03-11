@@ -48,11 +48,13 @@ void checkValidInput(const std::vector<float>& a, const std::vector<float>& b){
         throw std::invalid_argument("Error: vectors must be the same size!");
 }
 
-void printResult(const std::vector<float>& a, const std::vector<float>& b,const std::vector<float>& c) {
+void printResult(const std::vector<float>& a, const std::vector<float>& b,const std::vector<float>& c,unsigned int n) {
     std::cout << "Result (A + B):" << std::endl;
-    for (int i = 0; i < c.size(); i++)
-        std::cout << "a[" << i << "] = " << a[i] << ", b[" << i << "] = " << b[i] << ", c[" << i << "] = " << c[i] << std::endl;
-
+    int bIndex;
+    for (int i = 0; i < c.size(); i++){
+        bIndex = (i / n + 1) * n - 1 - (i % n);
+        std::cout << "a[" << i << "] = " << a[i] << ", b[" << bIndex << "] = " << b[bIndex] << ", c[" << i << "] = " << c[i] << std::endl;
+    }
 }
 
 void writeResultToFile(const std::vector<float>& c){

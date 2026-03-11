@@ -5,10 +5,12 @@ __global__ void addKernel(float *c, const float *a, const float *b, unsigned int
 {
     int i = threadIdx.x + blockDim.x * blockIdx.x;
     int index;
+    int indexB;
     if(i < vectorSize/n ){
         for (int j = 0; j < n; j++){
             index = i + j * vectorSize/n;
-            c[index] = ((index & 1) == 0) * b[index] * b[index] + (((index) & 1) == 1) * (a[index] + b[index]);
+            indexB =  (index / n + 1) * n - 1 - (index % n);
+            c[index] = a[index] + b[indexB]; 
         }
     }
 }

@@ -29,7 +29,7 @@ int main()
         return 1;
     }
    
-    printResult(a,b,c);
+    printResult(a,b,c,n);
 
     try{
         writeResultToFile(c);
