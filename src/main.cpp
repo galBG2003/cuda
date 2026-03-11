@@ -22,8 +22,8 @@ int main()
     }
        
     std::vector<float> c(a.size(), 0);
-
-    cudaError_t cudaStatus = addWithCuda(c.data(), a.data(), b.data(), a.size(), numThreadsPerBlock);
+    int n = 10;
+    cudaError_t cudaStatus = addWithCuda(c.data(), a.data(), b.data(), a.size(), numThreadsPerBlock,n);
     if (cudaStatus != cudaSuccess) {
         std::cerr << "addWithCuda failed!" << std::endl;
         return 1;

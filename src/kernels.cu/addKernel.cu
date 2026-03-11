@@ -1,22 +1,23 @@
 #include "device_launch_parameters.h"  
 #include "../../include/kernels.cuh/addKernel.cuh"
 
-__global__ void addKernel(float *c, const float *a, const float *b, unsigned int vectorSize)
+__global__ void addKernel(float *c, const float *a, const float *b, unsigned int vectorSize, unsigned int n)
 {
     int i = threadIdx.x + blockDim.x * blockIdx.x;
-    if(i < vectorSize/2 ){
-        c[i] = ((i & 1) == 0) * b[i] * b[i] + ((i & 1) == 1) * (a[i] + b[i]);
-        c[i + vectorSize/2] = ((i & 1) == 0) * b[i + vectorSize/2] * b[i + vectorSize/2] + (((i + vectorSize/2) & 1) == 1) * (a[i + vectorSize/2] + b[i + vectorSize/2]);
+    int index;
+    if(i < vectorSize/n ){
+        for (int j = 0; j < n; j++){
+            index = i + j * vectorSize/n;
+            c[index] = ((index & 1) == 0) * b[index] * b[index] + (((index) & 1) == 1) * (a[index] + b[index]);
+        }
     }
-        
-    
 }
 
-cudaError_t addWithCuda(float *c, const float *a, const float *b, unsigned int size,unsigned int ThreadsPerBlock)
+cudaError_t addWithCuda(float *c, const float *a, const float *b, unsigned int size,unsigned int ThreadsPerBlock, unsigned int n)
 {
     float *dev_a = 0, *dev_b = 0, *dev_c = 0;
     cudaError_t cudaStatus;
-    int numBlocks = (size/2 + ThreadsPerBlock - 1)/ThreadsPerBlock;
+    int numBlocks = (size/n + ThreadsPerBlock - 1)/ThreadsPerBlock;
     cudaStatus = cudaSetDevice(0);
 
     cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(float));
@@ -26,7 +27,7 @@ cudaError_t addWithCuda(float *c, const float *a, const float *b, unsigned int s
     cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(float), cudaMemcpyHostToDevice);
     cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(float), cudaMemcpyHostToDevice);
 
-    addKernel<<<numBlocks, ThreadsPerBlock>>>(dev_c, dev_a, dev_b,size);
+    addKernel<<<numBlocks, ThreadsPerBlock>>>(dev_c, dev_a, dev_b,size,n);
 
     cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(float), cudaMemcpyDeviceToHost);
 
