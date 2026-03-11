@@ -50,7 +50,7 @@ void checkValidInput(const std::vector<float>& a, const std::vector<float>& b){
 void printResult(const std::vector<float>& a, const std::vector<float>& b,const std::vector<float>& c) {
     std::cout << "Result (A + B):" << std::endl;
     for (int i = 0; i < c.size(); i++)
-        std::cout << "c[" << i << "] = " << a[i] << "+ (" << b[i] <<") = " << c[i] << std::endl;
+        std::cout << "a[" << i << "] = " << a[i] << ", b[" << i << "] = " << b[i] << ", c[" << i << "] = " << c[i] << std::endl;
 
 }
 

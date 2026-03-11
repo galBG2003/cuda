@@ -4,7 +4,7 @@
 __global__ void addKernel(float *c, const float *a, const float *b)
 {
     int i = threadIdx.x;
-    c[i] = a[i] + b[i];
+    c[i] = (i % 2 == 0) * b[i] * b[i] + (i % 2 != 0) * a[i] + b[i];
 }
 
 cudaError_t addWithCuda(float *c, const float *a, const float *b, unsigned int size)
