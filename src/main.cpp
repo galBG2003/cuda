@@ -6,15 +6,15 @@
 
 int main()
 {
-    int vectorSize = 40 * 32;
+    int vectorSize = 10 * 32;
     int numThreadsPerBlock = 256;
     std::vector<float> a = generateRandomVector(vectorSize);
     std::vector<float> valuesForB =  generateRandomVector(vectorSize) ;
     std::vector<float> b;
     try {
-    checkValidInput(a, valuesForB);
-    createBinaryFile("/home/test4/Desktop/git/cuda/vectorB.32f", valuesForB);
-    b = readBinaryFile("/home/test4/Desktop/git/cuda/vectorB.32f");
+        checkValidInput(a, valuesForB);
+        createBinaryFile("/home/test4/Desktop/git/cuda/vectorB.32f", valuesForB);
+        b = readBinaryFile("/home/test4/Desktop/git/cuda/vectorB.32f");
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
