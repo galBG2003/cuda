@@ -1,0 +1,8 @@
+test_config:
+  channelizer_config:
+    fs_hz: 1000
+    bw_hz : 100
+    num_taps: 501
+  tol: 0.01
+ 
+  
