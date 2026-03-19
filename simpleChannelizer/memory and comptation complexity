@@ -1,0 +1,9 @@
+
+Computation complexity:
+Each channel is going throw DDC (exponent multiplication) which corresponds to O(N), convolution with filter which corresponds to O(L*N) and decimation (which in neglectable). So overall:
+O(M*L*N)
+Where M is number of channels, L is number of filter taps and N is number of samples. 
+	
+Memory complexity:
+for my vectorize implementation, the memory complexity is O(M*N) which is derived from the phase matrix.
+with the naïve way with using for loop on the number of channels, the memory complexity will be O(N). 
