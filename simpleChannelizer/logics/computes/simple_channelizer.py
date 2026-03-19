@@ -10,18 +10,14 @@ class simpleChannelizer(ComputeBase):
     class Config(ComputeBase.Config):
         fs_hz : pydantic.PositiveInt
         bw_hz : pydantic.PositiveInt
-        num_taps : pydantic.PositiveInt
         def create_logical_instance(self):
             return simpleChannelizer(config=self)
     def __init__(self, config):
         super().__init__(config)
-        #self.fc_normalized = self.config.bw_hz / self.config.fs_hz
-        #self.filter_taps = signal.firwin(self.config.num_taps, self.fc_normalized, window = ('kaiser',10))
         data = loadmat('filter_100hz_cutoff.mat')
         self.filter_taps = data['Num'].flatten()  
         self.filter_taps = self.filter_taps / np.sum(self.filter_taps)  
-        
-
+ 
     def compute(self,spectrum : np.ndarray) -> np.ndarray:
          num_sampels = spectrum.size
          num_Channels = int(self.config.fs_hz // self.config.bw_hz)
