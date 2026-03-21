@@ -1,0 +1,10 @@
+test_config:
+  channelizer_config:
+    fs_hz: 1000
+    bw_hz : 100
+    filter_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/filter_taps_fs_1000_bw_100.fcf
+  tol: 0.05
+  input_signal_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/full_signal1.32fc
+  test_signal_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/ref_channels2.32fc
+ 
+  
