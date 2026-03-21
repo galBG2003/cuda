@@ -12,12 +12,12 @@ class simpleChannelizer(ComputeBase):
         bw_hz : pydantic.PositiveInt
         def create_logical_instance(self):
             return simpleChannelizer(config=self)
-    def __init__(self, config):
-        super().__init__(config)
+            
+    def initialize(self):
         data = loadmat('filter_100hz_cutoff.mat')
         self.filter_taps = data['Num'].flatten()  
         self.filter_taps = self.filter_taps / np.sum(self.filter_taps)  
- 
+    
     def compute(self,spectrum : np.ndarray) -> np.ndarray:
          num_sampels = spectrum.size
          num_Channels = int(self.config.fs_hz // self.config.bw_hz)
@@ -31,11 +31,7 @@ class simpleChannelizer(ComputeBase):
          shifted_spectrum = phase_matrix * spectrum
          filtered_signals = signal.lfilter(self.filter_taps, 1.0, shifted_spectrum, axis=1)
          output = filtered_signals[:, ::num_Channels]
-         print(f"center_freqs: {center_freqs}")
-         print(f"thetas: {thetas}")
-         print(f"filter_taps sum: {np.sum(self.filter_taps)}")
-         print(f"calc amplitudes: {np.mean(np.abs(output), axis=1)}")
-         
+                  
          return output
          
           
