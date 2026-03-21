@@ -16,14 +16,13 @@ class polyphaseChannelizer(ComputeBase):
 
     def initialize(self):
         self.filter_taps = np.loadtxt(self.config.filter_path, dtype=np.float32)
-
+        self.num_filter_taps = self.filter_taps.size
     def compute(self, data: np.ndarray) -> np.ndarray:
         num_samples_raw = data.size
         num_channels = int(self.config.fs_hz // self.config.bw_hz)
         num_samples = (num_samples_raw // num_channels) * num_channels 
         num_samples_per_channel = int(num_samples // num_channels)
-        num_filter_taps = self.filter_taps.size
-        OLA = int(num_filter_taps // num_channels)
+        OLA = int(self.num_filter_taps // num_channels)
         data_mat = data.reshape(-1, num_channels)
         banks_mat = self.filter_taps.reshape(OLA, num_channels)
         filterd_and_decimated_signal = [lfilter(banks_mat[:, i], 1, data_mat[:, i]) for i in range(num_channels)]
