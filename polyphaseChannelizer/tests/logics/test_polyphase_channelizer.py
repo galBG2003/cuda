@@ -36,7 +36,6 @@ class TestClass:
         fs = test_config.channelizer_config.fs_hz
         bw = test_config.channelizer_config.bw_hz
         num_channels = int(fs // bw)
-
         input_signal = np.fromfile(test_config.input_signal_path, dtype=np.complex64)
         test_signal_flat = np.fromfile(test_config.test_signal_path, dtype=np.complex64)
         num_frames = len(test_signal_flat) // num_channels
