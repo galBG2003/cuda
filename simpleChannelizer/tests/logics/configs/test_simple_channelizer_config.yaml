@@ -2,6 +2,10 @@ test_config:
   channelizer_config:
     fs_hz: 1000
     bw_hz : 100
+    filter_path: /home/test4/Desktop/git/cuda/simpleChannelizer/signals/filter_taps_fs_1000_bw_100.fcf
+  input_path: /home/test4/Desktop/git/cuda/simpleChannelizer/signals/full_signal1.32fc
+  test_path: /home/test4/Desktop/git/cuda/simpleChannelizer/signals/ref_channels2.32fc
   tol: 0.01
+
  
   

@@ -8,16 +8,16 @@ from scipy.io import loadmat
 
 class simpleChannelizer(ComputeBase):
     class Config(ComputeBase.Config):
-        fs_hz : pydantic.PositiveInt
-        bw_hz : pydantic.PositiveInt
+        fs_hz: pydantic.PositiveInt
+        bw_hz: pydantic.PositiveInt
+        filter_path: str
+
         def create_logical_instance(self):
             return simpleChannelizer(config=self)
             
     def initialize(self):
-        data = loadmat('filter_100hz_cutoff.mat')
-        self.filter_taps = data['Num'].flatten()  
-        self.filter_taps = self.filter_taps / np.sum(self.filter_taps)  
-    
+        self.filter_taps = np.loadtxt(self.config.filter_path, dtype=np.float32)
+       
     def compute(self,spectrum : np.ndarray) -> np.ndarray:
          num_sampels = spectrum.size
          num_Channels = int(self.config.fs_hz // self.config.bw_hz)
