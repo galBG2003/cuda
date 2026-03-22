@@ -4,6 +4,7 @@ import pytest
 import hydra
 from omegaconf import OmegaConf
 
+
 from logics.computes.polyphase_Channelizer import polyphaseChannelizer
 from utils.signal_generator import generate_test_input
 from utils.cosine_similarity import cosine_similarity
@@ -26,7 +27,7 @@ def test_config(request) -> TestConfig:
     return test_cfg
 
 class TestClass:
-    @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config"], indirect=True)
+    @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config_cpu","test_polyphase_channelizer_config_gpu"], indirect=True)
     def test_polyphase_channelizer(self, test_config: TestConfig):
         fs = test_config.channelizer_config.fs_hz
         bw = test_config.channelizer_config.bw_hz
@@ -35,17 +36,15 @@ class TestClass:
         test_signal_flat = np.fromfile(test_config.test_signal_path, dtype=np.complex64)
         num_frames = len(test_signal_flat) // num_channels
         test_signal_channels = np.zeros((num_frames, num_channels), dtype=np.complex64)
-        for i in range(num_channels):
-            start = i * num_frames
-            end = (i + 1) * num_frames
-            test_signal_channels[:, i] = test_signal_flat[start:end]
-        
+        test_signal_channels = test_signal_flat.reshape(-1,num_channels, order = 'F')
         module = test_config.channelizer_config.create_logical_instance()
         calc_output = module.compute(input_signal)
         assert calc_output.ndim == 2, "Output must be 2D"
         assert calc_output.shape[1] == num_channels, "Channel count mismatch"
-
-        similarity = cosine_similarity(test_signal_channels, calc_output)
+        margin = int(np.ceil(module.filter_taps.size / num_channels))
+        test_trimmed = test_signal_channels[margin : -margin, :]
+        calc_trimmed = calc_output[margin:-margin, :]
+        similarity = cosine_similarity(test_trimmed, calc_trimmed)
         assert np.all(similarity > 1 - test_config.tol), (
             f"Similarity per channel: {similarity}\n"
             f"Failed channels: {np.where(similarity <= 1 - test_config.tol)[0]}"

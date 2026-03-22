@@ -9,9 +9,7 @@ class ComputeBase(abc.ABC):
         """Base config for all computing logics"""
 
         def create_logical_instance(self) -> "ComputeBase":
-            raise NotImplementedError(
-                "Config must implement create_logical_instance()"
-            )
+            pass
 
     def __init__(self, config: "ComputeBase.Config"):
         self.config = config
