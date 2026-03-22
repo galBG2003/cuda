@@ -29,7 +29,7 @@ class TestClass:
     @pytest.mark.parametrize("device", ["cpu", "gpu"])
     @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config"], indirect=True)
     def test_polyphase_channelizer(self, test_config: TestConfig,device):
-        test_config.channelizer_config.use_gpu = (device == "cpu")
+        test_config.channelizer_config.use_gpu = (device == "gpu")
         module = test_config.channelizer_config.create_logical_instance()
                
         fs = test_config.channelizer_config.fs_hz
@@ -45,9 +45,11 @@ class TestClass:
 
         assert calc_output.ndim == 2, "Output must be 2D"
         assert calc_output.shape[1] == num_channels, "Channel count mismatch"
+
         margin = int(np.ceil(module.filter_taps.size / num_channels))
         test_trimmed = test_signal_channels[margin : -margin, :]
         calc_trimmed = calc_output[margin:-margin, :]
+        
         similarity = cosine_similarity(test_trimmed, calc_trimmed)
         assert np.all(similarity > 1 - test_config.tol), (
             f"Similarity per channel: {similarity}\n"
