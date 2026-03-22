@@ -25,11 +25,6 @@ def test_config(request) -> TestConfig:
     test_cfg = TestConfig.model_validate(test_cfg_dict)
     return test_cfg
 
-def generate_single_tone(fs, freq_hz, num_samples, amp=1.0):
-    t = np.arange(num_samples) / fs
-    return (amp * np.exp(1j * 2 * np.pi * freq_hz * t)).astype(np.complex64)
-
-
 class TestClass:
     @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config"], indirect=True)
     def test_polyphase_channelizer(self, test_config: TestConfig):
