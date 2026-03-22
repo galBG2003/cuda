@@ -3,12 +3,11 @@ import pydantic
 import pytest
 import hydra
 from omegaconf import OmegaConf
-
+import cupy as cp
 
 from logics.computes.polyphase_Channelizer import polyphaseChannelizer
-from utils.signal_generator import generate_test_input
 from utils.cosine_similarity import cosine_similarity
-from scipy.io import loadmat
+
 
 
 class TestConfig(pydantic.BaseModel):
@@ -27,18 +26,23 @@ def test_config(request) -> TestConfig:
     return test_cfg
 
 class TestClass:
-    @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config_cpu","test_polyphase_channelizer_config_gpu"], indirect=True)
-    def test_polyphase_channelizer(self, test_config: TestConfig):
+    @pytest.mark.parametrize("device", ["cpu", "gpu"])
+    @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config"], indirect=True)
+    def test_polyphase_channelizer(self, test_config: TestConfig,device):
+        test_config.channelizer_config.use_gpu = (device == "cpu")
+        module = test_config.channelizer_config.create_logical_instance()
+               
         fs = test_config.channelizer_config.fs_hz
         bw = test_config.channelizer_config.bw_hz
         num_channels = int(fs // bw)
         input_signal = np.fromfile(test_config.input_signal_path, dtype=np.complex64)
         test_signal_flat = np.fromfile(test_config.test_signal_path, dtype=np.complex64)
-        num_frames = len(test_signal_flat) // num_channels
-        test_signal_channels = np.zeros((num_frames, num_channels), dtype=np.complex64)
         test_signal_channels = test_signal_flat.reshape(-1,num_channels, order = 'F')
-        module = test_config.channelizer_config.create_logical_instance()
         calc_output = module.compute(input_signal)
+
+        if device == "gpu":
+            calc_output = cp.asnumpy(calc_output)
+
         assert calc_output.ndim == 2, "Output must be 2D"
         assert calc_output.shape[1] == num_channels, "Channel count mismatch"
         margin = int(np.ceil(module.filter_taps.size / num_channels))
