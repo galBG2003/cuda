@@ -21,6 +21,7 @@ class polyphaseChannelizer(ComputeBase):
         self.num_filter_taps = self.filter_taps.size
         self.num_channels = int(self.config.fs_hz // self.config.bw_hz)
         self.OLA = int(self.num_filter_taps // self.num_channels)
+        self.banks_mat = self.filter_taps.reshape(self.OLA, self.num_channels)
 
     def compute(self, data: ArrayType) -> ArrayType:
         """
@@ -37,11 +38,10 @@ class polyphaseChannelizer(ComputeBase):
         num_samples = (num_samples_raw // self.num_channels) * self.num_channels 
 
         data_mat = data.reshape(-1, self.num_channels)
-        banks_mat = self.filter_taps.reshape(self.OLA, self.num_channels)
-
-        convolution_length = data_mat.shape[0] + banks_mat.shape[0] - 1
+        
+        convolution_length = data_mat.shape[0] + self.banks_mat.shape[0] - 1
         data_fft = self.type.fft.fft(data_mat, n=convolution_length, axis=0)
-        banks_fft = self.type.fft.fft(banks_mat, n=convolution_length, axis=0)
+        banks_fft = self.type.fft.fft(self.banks_mat, n=convolution_length, axis=0)
         filtered_fft = data_fft * banks_fft
         filterd_and_decimated_mat = self.type.fft.ifft(filtered_fft, axis=0)[:data_mat.shape[0], :]
         
