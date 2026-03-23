@@ -56,4 +56,5 @@
 *.idb
 *.vcxproj.user
 *.exe.recipe
-*.vcxproj.filters
+*.vcxproj.filters**/__pycache__/
+**/*.pyc

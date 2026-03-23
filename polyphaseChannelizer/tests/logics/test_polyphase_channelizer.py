@@ -1,0 +1,58 @@
+import numpy as np
+import pydantic
+import pytest
+import hydra
+from omegaconf import OmegaConf
+import cupy as cp
+
+from logics.computes.polyphase_Channelizer import polyphaseChannelizer
+from utils.cosine_similarity import cosine_similarity
+
+
+
+class TestConfig(pydantic.BaseModel):
+    channelizer_config: polyphaseChannelizer.Config
+    test_signal_path: str
+    input_signal_path:str
+    tol: pydantic.PositiveFloat = 0.05
+
+@pytest.fixture(scope="session")
+def test_config(request) -> TestConfig:
+    scenario_name = request.param
+    with hydra.initialize(version_base=None, config_path="configs"):
+        cfg = hydra.compose(config_name=scenario_name)
+    test_cfg_dict = OmegaConf.to_container(cfg.test_config, resolve=True)
+    test_cfg = TestConfig.model_validate(test_cfg_dict)
+    return test_cfg
+
+class TestClass:
+    @pytest.mark.parametrize("device", ["cpu", "gpu"])
+    @pytest.mark.parametrize("test_config", ["test_polyphase_channelizer_config"], indirect=True)
+    def test_polyphase_channelizer(self, test_config: TestConfig,device):
+        test_config.channelizer_config.use_gpu = (device == "gpu")
+        module = test_config.channelizer_config.create_logical_instance()
+               
+        fs = test_config.channelizer_config.fs_hz
+        bw = test_config.channelizer_config.bw_hz
+        num_channels = int(fs // bw)
+        input_signal = np.fromfile(test_config.input_signal_path, dtype=np.complex64)
+        test_signal_flat = np.fromfile(test_config.test_signal_path, dtype=np.complex64)
+        test_signal_channels = test_signal_flat.reshape(-1,num_channels, order = 'F')
+        calc_output = module.compute(input_signal)
+
+        if device == "gpu":
+            calc_output = cp.asnumpy(calc_output)
+
+        assert calc_output.ndim == 2, "Output must be 2D"
+        assert calc_output.shape[1] == num_channels, "Channel count mismatch"
+
+        margin = int(np.ceil(module.filter_taps.size / num_channels))
+        test_trimmed = test_signal_channels[margin : -margin, :]
+        calc_trimmed = calc_output[margin:-margin, :]
+        
+        similarity = cosine_similarity(test_trimmed, calc_trimmed)
+        assert np.all(similarity > 1 - test_config.tol), (
+            f"Similarity per channel: {similarity}\n"
+            f"Failed channels: {np.where(similarity <= 1 - test_config.tol)[0]}"
+        )
+            
