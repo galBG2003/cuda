@@ -27,12 +27,10 @@ class polyphaseChannelizer(ComputeBase):
         preform the logic of polyphase channelizer. devides a spectrum with width fs to narrow channnels with
         width of bw. for the general case of no overlap between channels. (decimation factor equals num channles)
         :param 
-            data (np.ndarray): The flat input signal (complex64).
-            taps (np.ndarray): Filter coefficients for the prototype filter.
-            num_channels (int): Number of frequency channels (M).
-            OLA (int): num of filter coefficients per channel
+            data (type.ndarray): The flat input signal (complex64).
+            taps (type.ndarray): Filter coefficients for the prototype filter.
         :return:
-            np.ndarray: A 2D matrix of shape (frames, num_channels).
+            type.ndarray: A 2D matrix of shape (frames, num_channels).
         """
         data = self.type.asarray(data)
         num_samples_raw = data.size
