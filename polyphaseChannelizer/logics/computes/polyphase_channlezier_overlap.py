@@ -29,11 +29,11 @@ class PolyphaseChannelizerOverlap(ComputeBase):
         if self.filter_taps.size % self.num_channels != 0:
             raise ValueError(f"Filter length ({self.filter_taps.size}) must be divisible by num_channels ({self.num_channels})")
 
-        self.OLA = int(self.filter_taps.size // self.num_channels)
+        self.OLA= int(self.filter_taps.size // self.num_channels)
         
         self.banks_mat = self.filter_taps.reshape(self.OLA, self.num_channels)
        
-        self.past_block_data = self.type.zeros(self.filter_taps.size - 1, dtype=self.type.complex64)
+        self.past_block_data = None
         self.frames_processed = 0
     
 
@@ -63,13 +63,13 @@ class PolyphaseChannelizerOverlap(ComputeBase):
         Concatenate history with current block and determine how many
         output frames can be produced.
         """
-        continued_data = self.type.concatenate([self.past_block_data, data])
+
+        if self.past_block_data is None:
+            continued_data = data
+        else:
+            continued_data = self.type.concatenate([self.past_block_data, data])
 
         first_time_index = self.filter_taps.size - 1
-
-        if continued_data.size <= first_time_index:
-            self.past_block_data = continued_data.copy()
-            return continued_data, 0
 
         num_output_frames = ((continued_data.size - 1) - first_time_index) // self.decimation_factor + 1
 
