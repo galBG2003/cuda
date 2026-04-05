@@ -61,7 +61,7 @@ class TestClass:
         calc_output = np.vstack(block_outputs)
         
         data_to_save = calc_output.T.copy().astype(np.complex64)
-        data_to_save.tofile("calc_output30.bin")
+        data_to_save.tofile("calc_output50.bin")
 
         assert calc_output.ndim == 2, "Final concatenated output must be 2D"
         assert calc_output.shape[1] == num_channels, (

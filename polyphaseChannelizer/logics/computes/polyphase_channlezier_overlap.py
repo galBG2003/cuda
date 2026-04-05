@@ -21,7 +21,6 @@ class PolyphaseChannelizerOverlap(ComputeBase):
 
         taps_cpu = np.fromfile(self.config.filter_path, dtype=np.float32)
         self.filter_taps = self.type.asarray(taps_cpu)
-        
         self.channel_spacing = self.config.bw_hz * (1.0 - self.config.overlap_factor)
         self.num_channels = int(self.config.fs_hz // self.channel_spacing) 
         self.decimation_factor = int(self.config.fs_hz // self.config.bw_hz)
@@ -29,9 +28,9 @@ class PolyphaseChannelizerOverlap(ComputeBase):
         if self.filter_taps.size % self.num_channels != 0:
             raise ValueError(f"Filter length ({self.filter_taps.size}) must be divisible by num_channels ({self.num_channels})")
 
-        self.OLA= int(self.filter_taps.size // self.num_channels)
+        self.ola= int(self.filter_taps.size // self.num_channels)
         
-        self.banks_mat = self.filter_taps.reshape(self.OLA, self.num_channels)
+        self.banks_mat = self.filter_taps.reshape(self.ola, self.num_channels)
        
         self.past_block_data = None
         self.frames_processed = 0
@@ -82,19 +81,19 @@ class PolyphaseChannelizerOverlap(ComputeBase):
         across the polyphase columns and correcting phase offsets caused by
         decimation. 
         """
-        weighted_sum = self.type.zeros(
-            (num_output_frames, self.num_channels),
-            dtype=self.type.complex64
-        )
+        weighted_sum = None
 
         first_time_index = self.filter_taps.size - 1
         frame_time_idx = first_time_index + self.type.arange(num_output_frames) * self.decimation_factor
         channel_idx = self.type.arange(self.num_channels)
 
-        for p in range(self.OLA):
+        for p in range(self.ola):
             sample_idx = frame_time_idx[:, None] - (p * self.num_channels + channel_idx[None, :])
             sub_mat = continued_data[sample_idx]
-            weighted_sum += sub_mat * self.banks_mat[p, :]
+            if weighted_sum is None:
+                weighted_sum = sub_mat * self.banks_mat[p, :]
+            else:
+                weighted_sum += sub_mat * self.banks_mat[p, :]
 
         return weighted_sum
 
