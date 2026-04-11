@@ -1,0 +1,13 @@
+test_config:
+  polyphase_config:
+    fs_hz: 1000
+    bw_hz: 100
+    overlap_factor: 0.5
+    filter_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/filter_taps_fs_1000_bw_100.fcf
+    use_gpu: false
+
+  simple_config:
+    fs_hz: 1000
+    bw_hz: 100
+    filter_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/filter_taps_fs_1000_bw_100.fcf
+    use_gpu: false

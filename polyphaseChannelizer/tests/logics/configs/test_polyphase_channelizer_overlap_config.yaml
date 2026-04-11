@@ -1,0 +1,12 @@
+test_config:
+  channelizer_config:
+    fs_hz: 1000
+    bw_hz : 100
+    overlap_factor: 0.5
+    filter_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/filter_taps_order_119_update2.32f
+    block_size: 1000
+  tol: 0.07
+  input_signal_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/full_signal_overlap4.32fc
+  test_signal_path: /home/test4/Desktop/git/cuda/polyphaseChannelizer/signals/ref_channels_overlap4.32fc
+ 
+  
